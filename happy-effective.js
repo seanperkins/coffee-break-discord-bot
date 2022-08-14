@@ -6,6 +6,12 @@ const {Client, Intents} = require('discord.js')
 const HE_BOT_TOKEN = process.env.HE_BOT_TOKEN
 
 function sendStandupMessage() {
+  const now = new Date()
+  const today = now.getDay()
+  // Only run on weekdays
+  if (today === 0 || today === 6) {
+    return
+  }
   const bot = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
   })
@@ -19,9 +25,11 @@ function sendStandupMessage() {
       (channel) => channel.name === 'daily-standup',
     )
     if (channel) {
+      // On Monday, mention last week
+      const yesterdayWord = today === 1 ? 'last week' : 'yesterday'
       const message = await channel.send(
         `
-- What did you do yesterday?
+- What did you do ${yesterdayWord}?
 - What are you going to today?
 - Is there anything blocking you?
 
