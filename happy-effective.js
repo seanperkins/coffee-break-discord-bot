@@ -9,7 +9,7 @@ function sendStandupMessage() {
   const now = new Date()
   const today = now.getDay()
   // Only run on weekdays
-  if (today === 0 || today === 6) {
+  if (today !== 5) {
     return
   }
   const bot = new Client({
@@ -26,24 +26,7 @@ function sendStandupMessage() {
     )
     if (channel) {
       // On Monday, mention last week
-      const yesterdayWord = today === 1 ? 'last week' : 'yesterday'
-      const message = await channel.send(
-        `
-- What did you do ${yesterdayWord}?
-- What are you going to today?
-- Is there anything blocking you?
-
-Reply in this thread with your answers.
-        `,
-      )
-      const date = new Date()
-      const dateString = `${
-        date.getMonth() + 1
-      }-${date.getDate()}-${date.getFullYear()}`
-      await message.startThread({
-        name: `${dateString} Standup`,
-        autoArchiveDuration: 1440, // 24 hours
-      })
+      const message = await channel.send(`What was a big win this week?`)
     }
   })
 }
