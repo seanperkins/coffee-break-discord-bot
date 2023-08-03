@@ -18,8 +18,8 @@ function glitchClique({botToken, coffeeWebhookUrl, gamesWebhookUrl}) {
   bot.on('voiceStateUpdate', (oldState, newState) => {
     let newChannelId = newState.channelId
     let oldChannelId = oldState.channelId
-    const channel = newState.channel.name
-    const oldChannel = oldState.channel.name
+    const channel = newState.channel?.name
+    const oldChannel = oldState.channel?.name
     const username = newState.member.user.username || 'someone'
     const name = usernameMap[username] || username
 
@@ -27,7 +27,6 @@ function glitchClique({botToken, coffeeWebhookUrl, gamesWebhookUrl}) {
     if (oldChannelId !== newChannelId) {
       if (newChannelId === null) {
         // User leaves all voice channels
-
         // If old user channel is PewPew or Watercooler, send a message to Slack
         if (oldChannel === 'PewPew') {
           sendSlackMessage(`${name} left PewPew`, gamesWebhookUrl)
