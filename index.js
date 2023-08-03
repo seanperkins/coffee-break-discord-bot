@@ -3,6 +3,8 @@ const fetch = require('node-fetch')
 const https = require('https')
 const Discord = require('discord.js')
 
+const usernameMap = require('./usernameMapping')
+
 const GC_BOT_TOKEN = process.env.GC_BOT_TOKEN
 const GC_COFFEE_WEBHOOK_URL = process.env.GC_COFFEE_WEBHOOK_URL
 const GC_GAMES_WEBHOOK_URL = process.env.GC_GAMES_WEBHOOK_URL
@@ -14,32 +16,39 @@ function glitchClique({botToken, coffeeWebhookUrl, gamesWebhookUrl}) {
   bot.login(botToken)
 
   bot.on('voiceStateUpdate', (oldState, newState) => {
-    let newUserChannel = newState.channelId
-    let oldUserChannel = oldState.channelId
-    if (oldUserChannel === null && newUserChannel !== null) {
-      const state = newState
-      // User Joins a voice channel
-      const name = state.member.user.username || 'Someone'
-      let message = `${name} has joined `
-      if (name === 'ohashi') {
-        message = 'A dirty troll appears in '
-      }
-      const channel = state.channel.name
-      if (channel === 'PewPew') {
-        sendSlackMessage(message + channel, gamesWebhookUrl)
-      } else if (channel === 'Watercooler') {
-        sendSlackMessage(message + channel, coffeeWebhookUrl)
-      }
-    } else if (newUserChannel === null) {
-      // User leaves a voice channel
-      const state = oldState
-      // User Joins a voice channel
-      const name = state.member.user.username || 'Someone'
-      const channel = state.channel.name
-      if (channel === 'PewPew') {
-        sendSlackMessage(`${name} left PewPew`, gamesWebhookUrl)
-      } else if (channel === 'Watercooler') {
-        sendSlackMessage(`${name} left Watercooler`, coffeeWebhookUrl)
+    let newChannelId = newState.channelId
+    let oldChannelId = oldState.channelId
+    const channel = newState.channel.name
+    const oldChannel = oldState.channel.name
+    const username = newState.member.user.username || 'someone'
+    const name = usernameMap[username] || username
+
+    // They have changed channels or from null state
+    if (oldChannelId !== newChannelId) {
+      if (newChannelId === null) {
+        // User leaves all voice channels
+
+        // If old user channel is PewPew or Watercooler, send a message to Slack
+        if (oldChannel === 'PewPew') {
+          sendSlackMessage(`${name} left PewPew`, gamesWebhookUrl)
+        } else if (oldChannel === 'Watercooler') {
+          sendSlackMessage(`${name} left Watercooler`, coffeeWebhookUrl)
+        }
+      } else {
+        // User joins a voice channel
+        // If old user channel is PewPew or Watercooler, send a message to Slack
+        if (oldChannel === 'PewPew') {
+          sendSlackMessage(`${name} left PewPew`, gamesWebhookUrl)
+        } else if (oldChannel === 'Watercooler') {
+          sendSlackMessage(`${name} left Watercooler`, coffeeWebhookUrl)
+        }
+
+        // If new user channel is PewPew or Watercooler, send a message to Slack
+        if (channel === 'PewPew') {
+          sendSlackMessage(`${name} joined PewPew`, gamesWebhookUrl)
+        } else if (channel === 'Watercooler') {
+          sendSlackMessage(`${name} joined Watercooler`, coffeeWebhookUrl)
+        }
       }
     }
   })
