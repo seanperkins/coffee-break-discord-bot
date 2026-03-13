@@ -1,15 +1,20 @@
-const cron = require('node-cron')
+require('dotenv').config()
 const facts = require('./clooneyFacts')
 
-function startDailyFact({webhookUrl, sendMessage}) {
-  // 1pm ET = 17:00 UTC (EST) or 18:00 UTC (EDT)
-  // Using America/New_York timezone to handle DST automatically
-  cron.schedule('0 13 * * *', () => {
-    const fact = facts[Math.floor(Math.random() * facts.length)]
-    sendMessage(fact, webhookUrl)
-  }, {
-    timezone: 'America/New_York',
+const FF_BOT_TOKEN = process.env.FF_BOT_TOKEN
+
+async function postFact() {
+  const fact = facts[Math.floor(Math.random() * facts.length)]
+  const data = JSON.stringify({text: fact})
+
+  await fetch(FF_BOT_TOKEN, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': data.length,
+    },
+    body: data,
   })
 }
 
-module.exports = {startDailyFact}
+postFact()

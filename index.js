@@ -2,12 +2,10 @@ require('dotenv').config()
 const {Client, GatewayIntentBits} = require('discord.js')
 
 const usernameMap = require('./usernameMapping')
-const {startDailyFact} = require('./dailyFact')
 
 const GC_BOT_TOKEN = process.env.GC_BOT_TOKEN
 const GC_COFFEE_WEBHOOK_URL = process.env.GC_COFFEE_WEBHOOK_URL
 const GC_GAMES_WEBHOOK_URL = process.env.GC_GAMES_WEBHOOK_URL
-const FF_BOT_TOKEN = process.env.FF_BOT_TOKEN
 
 function glitchClique({botToken, coffeeWebhookUrl, gamesWebhookUrl}) {
   const bot = new Client({
@@ -77,9 +75,4 @@ glitchClique({
   botToken: GC_BOT_TOKEN,
   coffeeWebhookUrl: GC_COFFEE_WEBHOOK_URL,
   gamesWebhookUrl: GC_GAMES_WEBHOOK_URL,
-})
-
-startDailyFact({
-  webhookUrl: FF_BOT_TOKEN,
-  sendMessage: sendSlackMessage,
 })
