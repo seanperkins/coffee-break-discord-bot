@@ -1,17 +1,32 @@
 require('dotenv').config()
-const clooneyFacts = require('./clooneyFacts')
-const shaqFacts = require('./shaqFacts')
+const philanthropyFacts = require('./philanthropyFacts')
+const pettyFacts = require('./pettyFacts')
 
 const FF_BOT_TOKEN = process.env.FF_BOT_TOKEN
 
+const MONDAY = 1
+const THURSDAY = 4
+
 async function postFact() {
-  // Alternate Clooney and Shaq day-by-day, and cycle through each list
-  // so every fact appears exactly once before any repeats.
+  // Heroku Scheduler runs this daily; only post on Monday and Thursday.
+  // Monday = wholesome rich-people philanthropy, Thursday = petty-rich-person antics.
+  const today = new Date()
+  const dayOfWeek = today.getUTCDay()
+
+  let list
+  if (dayOfWeek === MONDAY) {
+    list = philanthropyFacts
+  } else if (dayOfWeek === THURSDAY) {
+    list = pettyFacts
+  } else {
+    return
+  }
+
+  // Cycle through each list one fact per posting day so every fact
+  // appears before any repeats.
   const msPerDay = 1000 * 60 * 60 * 24
-  const dayNumber = Math.floor(Date.now() / msPerDay)
-  const useClooney = dayNumber % 2 === 0
-  const list = useClooney ? clooneyFacts : shaqFacts
-  const fact = list[Math.floor(dayNumber / 2) % list.length]
+  const weekNumber = Math.floor(Date.now() / msPerDay / 7)
+  const fact = list[weekNumber % list.length]
   const data = JSON.stringify({text: fact})
 
   await fetch(FF_BOT_TOKEN, {
