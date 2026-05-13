@@ -8,6 +8,9 @@ const MONDAY = 1
 const THURSDAY = 4
 
 async function postFact() {
+  // Paused — remove this return to resume posting.
+  return
+
   // Heroku Scheduler runs this daily; only post on Monday and Thursday.
   // Monday = wholesome rich-people philanthropy, Thursday = petty-rich-person antics.
   const today = new Date()
